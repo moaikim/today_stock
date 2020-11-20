@@ -58,8 +58,8 @@ class StockRankCron():
             self.scheduler.add_job(self.exec)
         elif mode == 'interval':
             self.scheduler.add_job(self.exec, 'interval', seconds=10)
-        elif mode == 'cron mode':
-            self.scheduler.add_job(self.exec, 'cron', hour='9,10,11,12,13,14,15', second='10')
+        elif mode == 'cron':
+            self.scheduler.add_job(self.exec, 'cron', hour='9,10,11,12,13,14,15', second='*/10')
 
     def stop(self):
         try: self.scheduler.shutdown() 
