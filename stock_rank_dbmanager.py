@@ -28,7 +28,8 @@ class StockRankDBManager:
         try: self.db.close()
         except: pass
     
-    def queryCreateStockRankTable(self):
+    def queryCreateStockRankTable(self, market):
+        self.daum_stock_rank_table = 'daum_stock_rank_' + market.lower()
         cursor = self.db.cursor()
         colum_info = ",".join(col_name + ' ' + col_type for col_name, col_type in self.daum_stock_rank_colums.items())
         query = "CREATE TABLE IF NOT EXISTS {} ({})".format(self.daum_stock_rank_table, colum_info)

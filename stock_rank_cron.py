@@ -11,6 +11,8 @@ class StockRankCron():
         self.scheduler = BackgroundScheduler(job_defaults={'max_instances': 10, 'coalesce': False})
         self.scheduler.start()
         self.dbManager = stock_rank_dbmanager.StockRankDBManager()
+        self.market = 'KOSPI'
+        self.max = 30
 
     def __del__(self): 
         self.stop()
@@ -19,10 +21,10 @@ class StockRankCron():
         print ('DaumStockCron Start: ' + datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
 
         params = {
+            'market': self.market,
+            'perPage': self.max,
             'page': 1,
-            'perPage': 30,
             'intervalType': 'TODAY',
-            'market': 'KOSPI',
             'changeType': 'RISE',
             'pagination': 'true',
             'order': 'desc'
@@ -36,7 +38,7 @@ class StockRankCron():
         URL = 'https://finance.daum.net/api/trend/price_performance'
 
         try: 
-            self.dbManager.queryCreateStockRankTable()
+            self.dbManager.queryCreateStockRankTable(self.market)
             self.dbManager.queryDeleteAlltDaumStockRankTable()
             res = requests.get(URL, headers=headers, params=params)
             if res.status_code == 200:
@@ -48,8 +50,10 @@ class StockRankCron():
         except requests.exceptions.RequestException as err:
             print ('Error Requests: {}'.format(err))
     
-    def run(self, mode):
+    def run(self, mode, market, max):
         print ("실행!")
+        self.market = market
+        self.max = max
         if mode == 'once':
             self.scheduler.add_job(self.exec)
         elif mode == 'interval':
